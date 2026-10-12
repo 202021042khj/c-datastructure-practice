@@ -1,66 +1,71 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-/* 링크로 구현한 이진 트리 */
-typedef struct Node {
-    int data;
-    struct Node *left;
-    struct Node *right;
-} Node;
+typedef int element;
 
-Node *make_node(int data, Node *left, Node *right) {
-    Node *node = (Node *)malloc(sizeof(Node));
-    node->data = data;
-    node->left = left;
-    node->right = right;
-    return node;
-}
+/* 링크로 구현한 이진 트리의 노드 */
+typedef struct TreeNode {
+    element data;
+    struct TreeNode *left;
+    struct TreeNode *right;
+} TreeNode;
 
-void inorder_print(Node *root) {
-    if (root == NULL)
+void inorder(TreeNode *root) {
+    if (root == NULL) {
         return;
-    inorder_print(root->left);
-    printf("%d ", root->data);
-    inorder_print(root->right);
-}
-
-void free_tree(Node *root) {
-    if (root == NULL)
-        return;
-    free_tree(root->left);
-    free_tree(root->right);
-    free(root);
-}
-
-int count_nodes(Node *root) {
-    if (root == NULL)
-        return 0;
-    return 1 + count_nodes(root->left) + count_nodes(root->right);
-}
-
-int tree_height(Node *root) {
-    if (root == NULL)
-        return 0;
-    int l = tree_height(root->left);
-    int r = tree_height(root->right);
-    return 1 + (l > r ? l : r);
+    } else {
+        inorder(root->left);
+        printf("%d ", root->data);
+        inorder(root->right);
+    }
 }
 
 int main(void) {
+    TreeNode *n1, *n2, *n3, *n4, *n5;
+
     /*        1
      *      /   \
      *     2     3
      *    / \
      *   4   5
      */
-    Node *root = make_node(1,
-                    make_node(2, make_node(4, NULL, NULL), make_node(5, NULL, NULL)),
-                    make_node(3, NULL, NULL));
+    n1 = (TreeNode *)malloc(sizeof(TreeNode));
+    n1->data = 1;
+    n1->left = NULL;
+    n1->right = NULL;
 
-    inorder_print(root);                       /* 4 2 5 1 3 */
-    printf("\nnodes: %d\n", count_nodes(root)); /* 5 */
-    printf("height: %d\n", tree_height(root));  /* 3 */
+    n2 = (TreeNode *)malloc(sizeof(TreeNode));
+    n2->data = 2;
+    n2->left = NULL;
+    n2->right = NULL;
 
-    free_tree(root);
+    n3 = (TreeNode *)malloc(sizeof(TreeNode));
+    n3->data = 3;
+    n3->left = NULL;
+    n3->right = NULL;
+
+    n4 = (TreeNode *)malloc(sizeof(TreeNode));
+    n4->data = 4;
+    n4->left = NULL;
+    n4->right = NULL;
+
+    n5 = (TreeNode *)malloc(sizeof(TreeNode));
+    n5->data = 5;
+    n5->left = NULL;
+    n5->right = NULL;
+
+    n1->left = n2;
+    n1->right = n3;
+    n2->left = n4;
+    n2->right = n5;
+
+    inorder(n1);                    /* 4 2 5 1 3 */
+    printf("\n");
+
+    free(n5);
+    free(n4);
+    free(n3);
+    free(n2);
+    free(n1);
     return 0;
 }
