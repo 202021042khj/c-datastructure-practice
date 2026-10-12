@@ -6,7 +6,7 @@
 
 | 폴더 | 파일 |
 |------|------|
-| `lists/` | `linked_list.c`, `circular_list.c`, `doubly_list.c`, `list_adt.c` |
+| `lists/` | `array_list.c`, `linked_list.c`, `circular_list.c`, `doubly_list.c`, `list_adt.c` |
 | `stacks/` | `array_stack.c`, `int_array_stack.c`, `struct_array_stack.c`, `linked_stack.c` |
 | `queues/` | `circular_queue.c`, `linked_queue.c`, `deque.c` |
 | `trees/` | `linked_binary_tree.c`, `tree_traversal.c`, `bst.c`, `avl.c` |

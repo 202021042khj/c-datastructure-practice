@@ -1,87 +1,76 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-/* 원형 연결 리스트: 마지막 노드의 next가 head를 가리킴 */
-typedef struct Node {
-    int data;
-    struct Node *next;
-} Node;
+typedef int element;
 
-Node *insert_front(Node *head, int value) {
-    Node *new_node = (Node *)malloc(sizeof(Node));
-    new_node->data = value;
+/* 원형 연결 리스트의 노드 */
+typedef struct ListNode {
+    element data;
+    struct ListNode *link;
+} ListNode;
 
-    if (head == NULL) {
-        new_node->next = new_node;
-        return new_node;
-    }
+/* head는 마지막 노드를 가리키고, 첫 노드는 head->link */
 
-    Node *last = head;
-    while (last->next != head)
-        last = last->next;
-
-    new_node->next = head;
-    last->next = new_node;
-    return new_node;   /* 새 노드가 head */
+ListNode *create_node(element data) {
+    ListNode *node = (ListNode *)malloc(sizeof(ListNode));
+    node->data = data;
+    node->link = NULL;
+    return node;
 }
 
-Node *delete_value(Node *head, int value) {
-    if (head == NULL)
-        return NULL;
-
-    Node *prev = head;
-    Node *cur = head;
-
-    while (cur->data != value) {
-        prev = cur;
-        cur = cur->next;
-        if (cur == head)       /* 한 바퀴 돌았는데 없음 */
-            return head;
+void insert_first(ListNode **phead, ListNode *node) {
+    if (*phead == NULL) {
+        node->link = node;
+        *phead = node;
+    } else {
+        node->link = (*phead)->link;
+        (*phead)->link = node;
     }
-
-    if (cur->next == cur) {    /* 노드가 하나뿐 */
-        free(cur);
-        return NULL;
-    }
-
-    if (cur == head) {         /* head 삭제: 마지막 노드를 찾아 연결 갱신 */
-        Node *last = head;
-        while (last->next != head)
-            last = last->next;
-        Node *new_head = head->next;
-        last->next = new_head;
-        free(head);
-        return new_head;
-    }
-
-    prev->next = cur->next;
-    free(cur);
-    return head;
 }
 
-void print_list(Node *head) {
+/* 마지막에 삽입: 첫 노드 앞에 넣은 뒤 head를 새 노드로 옮김 */
+void insert_last(ListNode **phead, ListNode *node) {
+    insert_first(phead, node);
+    *phead = node;
+}
+
+/* 첫 노드 삭제 */
+void delete_first(ListNode **phead) {
+    if (*phead == NULL)
+        return;
+
+    ListNode *removed = (*phead)->link;
+    if (removed == *phead) {          /* 노드가 하나뿐 */
+        *phead = NULL;
+    } else {
+        (*phead)->link = removed->link;
+    }
+    free(removed);
+}
+
+void display(ListNode *head) {
     if (head == NULL) {
         printf("(empty)\n");
         return;
     }
-    Node *cur = head;
+    ListNode *p = head->link;
     do {
-        printf("%d ", cur->data);
-        cur = cur->next;
-    } while (cur != head);
+        printf("%d ", p->data);
+        p = p->link;
+    } while (p != head->link);
     printf("\n");
 }
 
 int main(void) {
-    Node *head = NULL;
+    ListNode *head = NULL;
 
-    head = insert_front(head, 3);
-    head = insert_front(head, 2);
-    head = insert_front(head, 1);
-    print_list(head);              /* 1 2 3 */
+    insert_last(&head, create_node(10));   /* 10 */
+    insert_last(&head, create_node(20));   /* 10 20 */
+    insert_first(&head, create_node(5));   /* 5 10 20 */
+    display(head);                         /* 5 10 20 */
 
-    head = delete_value(head, 1);
-    print_list(head);              /* 2 3 */
+    delete_first(&head);                   /* 5 삭제 */
+    display(head);                         /* 10 20 */
 
     return 0;
 }

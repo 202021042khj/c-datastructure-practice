@@ -1,61 +1,70 @@
 #include <stdio.h>
+#include <stdlib.h>
 
-#define MAX_SIZE 10
+#define MAX_STACK_SIZE 10
 
-/* 구조체를 원소로 갖는 배열 스택 */
+/* 원소 타입이 구조체인 스택 */
 typedef struct {
     int id;
     char name[20];
-} Item;
+} element;
 
-typedef struct {
-    Item data[MAX_SIZE];
-    int top;
-} Stack;
+/* 전역 배열과 top으로 구현한 스택: top은 마지막 원소의 인덱스, 비었을 때 -1 */
+element stack[MAX_STACK_SIZE];
+int top = -1;
 
-void init_stack(Stack *s) {
-    s->top = -1;
+void error(char *message) {
+    fprintf(stderr, "%s\n", message);
+    exit(1);
 }
 
-int is_empty(Stack *s) {
-    return s->top == -1;
+int is_empty() {
+    return (top == -1);
 }
 
-int is_full(Stack *s) {
-    return s->top == MAX_SIZE - 1;
+int is_full() {
+    return (top == (MAX_STACK_SIZE - 1));
 }
 
-void push(Stack *s, Item item) {
-    if (is_full(s)) {
-        printf("Overflow\n");
-        return;
+void push(element item) {
+    if (is_full()) {
+        error("스택 포화 에러");
+    } else {
+        stack[++top] = item;
     }
-    s->data[++(s->top)] = item;
 }
 
-/* 성공하면 1, 실패하면 0 반환. 꺼낸 값은 *out에 저장 */
-int pop(Stack *s, Item *out) {
-    if (is_empty(s)) {
-        printf("Underflow\n");
-        return 0;
+element pop() {
+    if (is_empty()) {
+        error("스택 공백 에러");
+    } else {
+        return stack[top--];
     }
-    *out = s->data[(s->top)--];
-    return 1;
+}
+
+element peek() {
+    if (is_empty()) {
+        error("스택 공백 에러");
+    } else {
+        return stack[top];
+    }
 }
 
 int main(void) {
-    Stack s;
-    Item item;
-    Item a = {1, "apple"};
-    Item b = {2, "banana"};
+    element a = {1, "apple"};
+    element b = {2, "banana"};
+    element item;
 
-    init_stack(&s);
-    push(&s, a);
-    push(&s, b);
+    push(a);
+    push(b);
 
-    pop(&s, &item);
-    printf("%d %s\n", item.id, item.name);   /* 2 banana */
-    pop(&s, &item);
-    printf("%d %s\n", item.id, item.name);   /* 1 apple */
+    item = peek();
+    printf("peek: %d %s\n", item.id, item.name);   /* 2 banana */
+
+    item = pop();
+    printf("pop: %d %s\n", item.id, item.name);    /* 2 banana */
+    item = pop();
+    printf("pop: %d %s\n", item.id, item.name);    /* 1 apple */
+
     return 0;
 }

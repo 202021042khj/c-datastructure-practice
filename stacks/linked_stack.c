@@ -1,54 +1,75 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-/* 연결 리스트로 구현한 스택: 맨 앞이 top */
-typedef struct Node {
-    int data;
-    struct Node *next;
-} Node;
+typedef int element;
 
-int is_empty(Node *top) {
-    return top == NULL;
+/* 연결 리스트로 구현한 스택의 노드 */
+typedef struct StackNode {
+    element data;
+    struct StackNode *link;
+} StackNode;
+
+/* top은 맨 앞 노드를 가리킴, 비었을 때 NULL */
+typedef struct {
+    StackNode *top;
+} LinkedStackType;
+
+void error(char *message) {
+    fprintf(stderr, "%s\n", message);
+    exit(1);
 }
 
-Node *push(Node *top, int value) {
-    Node *new_node = (Node *)malloc(sizeof(Node));
-    new_node->data = value;
-    new_node->next = top;
-    return new_node;
+void init_stack(LinkedStackType *s) {
+    s->top = NULL;
 }
 
-/* 성공하면 1 반환, 꺼낸 값은 *out에 저장, 새 top은 *top_ref에 저장 */
-int pop(Node **top_ref, int *out) {
-    if (is_empty(*top_ref)) {
-        printf("Underflow\n");
-        return 0;
+int is_empty(LinkedStackType *s) {
+    return (s->top == NULL);
+}
+
+/* 맨 앞에 새 노드를 넣음 */
+void push(LinkedStackType *s, element item) {
+    StackNode *temp = (StackNode *)malloc(sizeof(StackNode));
+    if (temp == NULL) {
+        error("메모리 할당 에러");
+    } else {
+        temp->data = item;
+        temp->link = s->top;
+        s->top = temp;
     }
-    Node *old = *top_ref;
-    *out = old->data;
-    *top_ref = old->next;
-    free(old);
-    return 1;
 }
 
-int peek(Node *top) {
-    if (is_empty(top))
-        return -1;
-    return top->data;
+element pop(LinkedStackType *s) {
+    if (is_empty(s)) {
+        error("스택 공백 에러");
+    } else {
+        StackNode *temp = s->top;
+        element item = temp->data;
+        s->top = temp->link;
+        free(temp);
+        return item;
+    }
+}
+
+element peek(LinkedStackType *s) {
+    if (is_empty(s)) {
+        error("스택 공백 에러");
+    } else {
+        return s->top->data;
+    }
 }
 
 int main(void) {
-    Node *top = NULL;
-    int value;
+    LinkedStackType s;
+    init_stack(&s);
 
-    top = push(top, 1);
-    top = push(top, 2);
-    top = push(top, 3);
-    printf("peek: %d\n", peek(top));  /* 3 */
+    push(&s, 1);
+    push(&s, 2);
+    push(&s, 3);
 
-    pop(&top, &value);
-    printf("pop: %d\n", value);       /* 3 */
-    pop(&top, &value);
-    printf("pop: %d\n", value);       /* 2 */
+    printf("peek: %d\n", peek(&s));   /* 3 */
+    printf("pop: %d\n", pop(&s));     /* 3 */
+    printf("pop: %d\n", pop(&s));     /* 2 */
+
     return 0;
 }
